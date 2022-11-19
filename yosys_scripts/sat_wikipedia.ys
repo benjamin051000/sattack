@@ -1,0 +1,15 @@
+
+# Read and build hierarchy
+read -sv benchmarks/custom/wikipedia.sv
+hierarchy -top wikipedia
+
+# Interpret design
+proc; opt; techmap; opt
+
+# Post processing
+# Use -show-ports instead of -show-all since the netlist is a black box to us
+# sat -show-ports -all -dump_cnf simple.cnf simple
+sat -show-all -all -dump_cnf wikipedia.cnf wikipedia
+
+# Show netlist
+show wikipedia

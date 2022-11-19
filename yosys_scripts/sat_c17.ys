@@ -1,0 +1,18 @@
+
+# Read and build hierarchy
+# read_liberty -ignore_miss_func libraries/mylib.lib
+# design -save lib
+read -sv benchmarks/comb/c17.v
+hierarchy -top c17
+
+# Interpret design
+proc; opt; techmap; opt
+
+# Finish library mapping
+# dfflibmap -liberty libraries/mylib.lib
+
+# Post processing
+sat -show-all -all -dump_cnf c17.cnf c17
+#write_verilog synth.v
+#show s27
+
