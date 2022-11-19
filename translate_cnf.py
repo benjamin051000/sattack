@@ -1,10 +1,14 @@
 import sys
 import re
-from typing import List
+from typing import List, Tuple
 from pprint import pprint
 
 # Easy way to toggle debug printing
 DEBUG = True
+
+def flip_dict(d: dict) -> dict:
+    """Flips the keys and values of a dict."""
+    return {v:k for k, v in d.items()}
 
 
 def split_by_section(text: str) -> List[str]:
@@ -32,13 +36,15 @@ def parse_clauses(text: str):
     return formatted
 
 
-def parse_cnf(text: str):
+def parse_cnf(text: str) -> Tuple[dict, dict, List[tuple]]:
 
     # Split the file into 3 sections
     sections = split_by_section(text)
 
     # First section is mappings from variable to literal
     var_to_lit = parse_mappings(sections[0])
+    # Flip keys and values so it's Literal to Variable
+    lit_to_var = flip_dict(var_to_lit)
 
     # Second section is mappings from variable to expression
     var_to_expr = parse_mappings(sections[1])
@@ -46,7 +52,36 @@ def parse_cnf(text: str):
     # Last section is the list of clauses
     clauses = parse_clauses(sections[2])
 
-    return var_to_lit, var_to_expr, clauses
+    return lit_to_var, var_to_expr, clauses
+
+
+def translate_var_to_expr(lit_to_var: dict, var_to_expr: dict) -> dict:
+    # First, flip Literal -> Variable => Variable -> Literal
+    # This allows us to access Literal from Variable, 
+    # and var to expr has Variables as keys
+    var_to_lit = flip_dict(lit_to_var)
+
+    lit_to_expr = {
+        var_to_lit.get(k, k): v  # Use k as default if dict[k] not found, AKA leave unmodified
+        for k, v in var_to_expr.items()
+    }    
+
+    return lit_to_expr
+
+
+def translate_clauses(clauses: List[Tuple[str]], lit_to_expr: dict) -> List[Tuple[str]]:
+
+    # Flip lit_to_expr
+    # See translate_var_to_expr for explanation
+    expr_to_lit = flip_dict(lit_to_expr)
+
+    translated = []
+    for clause in clauses:
+        # Replace any expressions that we know the literal for
+        t = tuple(expr_to_lit.get(e, e) for e in clause)
+        translated.append(t)
+            
+    return translated
 
 
 def main():
@@ -59,15 +94,23 @@ def main():
         exit()
 
     # Parse the file into its relevant information
-    var_to_lit, var_to_expr, clauses = parse_cnf(text)
-    print("Variable -> Literal")
-    pprint(var_to_lit)
+    lit_to_var, var_to_expr, clauses = parse_cnf(text)
+    print("Literal -> Variable")
+    pprint(lit_to_var)
 
     print("Variable -> Expression")
     pprint(var_to_expr)
 
     print("Clauses:")
     pprint(clauses)
+
+    lit_to_expr = translate_var_to_expr(lit_to_var, var_to_expr)
+    print("\nNew: Literal to expression")
+    pprint(lit_to_expr)
+
+    translated_clauses = translate_clauses(clauses, lit_to_expr)
+    print("\nTranslated clauses:")
+    pprint(translated_clauses)
 
 
 if __name__ == '__main__':
