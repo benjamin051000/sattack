@@ -12,7 +12,7 @@ proc; opt; techmap; opt
 # dfflibmap -liberty libraries/mylib.lib
 
 # Post processing
-sat -show-all -all -dump_cnf c17.cnf c17
+sat -show-all -all -dump_cnf cnfs/c17.cnf c17
 #write_verilog synth.v
 #show s27
 

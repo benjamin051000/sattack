@@ -9,7 +9,7 @@ proc; opt; techmap; opt
 # Post processing
 # Use -show-ports instead of -show-all since the netlist is a black box to us
 # sat -show-ports -all -dump_cnf simple.cnf simple
-sat -show-all -all -dump_cnf simple.cnf simple
+sat -show-all -all -dump_cnf cnfs/simple.cnf simple
 
 # Show netlist
 show simple
