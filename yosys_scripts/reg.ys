@@ -1,0 +1,18 @@
+# Read and build hierarchy
+read -sv benchmarks/custom/flipflop.sv
+hierarchy -top flipflop
+
+# Interpret design
+proc;
+opt;
+
+techmap; 
+opt;
+
+#write_verilog flipflop_synth.v
+#show flipflop
+
+flatten
+
+# Post processing
+sat  -all -seq 2 -set-at 0 clk 1'b0 -set-at 1 clk 1'b1 -dump_cnf cnfs/flipflop.cnf flipflop
