@@ -1,0 +1,12 @@
+read -sv benchmarks/seq/s510.v
+read -sv libraries/dff.v
+hierarchy -top s510
+
+# Interpret design
+proc; opt
+techmap; opt
+flatten;
+
+#show s510
+sat -all -seq 2 -dump_cnf cnfs/s510.cnf s510
+
